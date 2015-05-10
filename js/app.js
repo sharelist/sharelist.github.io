@@ -137,8 +137,9 @@ application = {
             }
 
             var keyword = encodeURIComponent(searchValue);
-            // Youtube API
-            var yt_url = '//gdata.youtube.com/feeds/api/videos?q=' + keyword + '&format=5&max-results=10&v=2&alt=jsonc';
+            //var yt_url = '//gdata.youtube.com/feeds/api/videos?q=' + keyword + '&format=5&max-results=10&v=2&alt=jsonc';
+            var yt_url = 'https://www.googleapis.com/youtube/v3/search?q=' + keyword + '&format=5&max-results=10&v=2&alt=json';
+                yt_url += '&key=AIzaSyC1Z8X72HT-NJeqHnYA2hyNrUqK7eM7REw&part=snippet';
 
             $.ajax
             ({
@@ -147,9 +148,9 @@ application = {
                 dataType: "jsonp",
                 success: function (response) {
                     clearResults();
-                    if (response.data.items) {
-                        $.each(response.data.items, function (j, data) {
-                            var id = data.id;
+                    if (response.items) {
+                        $.each(response.items, function (j, data) {
+                            var id = data.id.videoId;
 
                             for (var i = 0; i < self.queue.length; i++) {
                                 if (id == self.queue[i].id) {
@@ -172,9 +173,9 @@ application = {
         }
 
         function createResultEntry(data) {
-            var video_id = data.id;
-            var video_title = data.title;
-            var video_image = getThumbnailByCode(data.id);
+            var video_id = data.id.videoId;
+            var video_title = data.snippet.title;
+            var video_image = getThumbnailByCode(video_id);
             var final = '<li class="result-item" data-id="' + video_id + '">' +
                 "<div class=\"col-xs-4 search-result-image\"><img src=\"" + video_image + "\"></div></div>" +
                 "<div class=\"col-xs-8 search-result-title\">" + video_title + "</div>" +
@@ -194,7 +195,6 @@ application = {
     },
 
     hashChanged: function (hash) {
-        console.log(hash);
 
         var routes = this.routes;
 
@@ -202,9 +202,9 @@ application = {
             var route = routes.array[i];
             var check = route.check(hash)
             if (check) {
-                console.log('OK: ' + check);
+                //console.log('OK: ' + check);
                 var action = route.action;
-                console.log(typeof this[action]);
+                //console.log(typeof this[action]);
                 if (typeof this[action] === 'function') {
                     this[action](check);
                 }
@@ -229,7 +229,7 @@ application = {
 
     createPlaylist: function (id) {
         this.playlistid = id;
-        console.log(this.getPlaylistConn().push({data: 'create'}));
+        this.getPlaylistConn().push({data: 'create'});
     },
 
     newAction: function () {
@@ -244,7 +244,7 @@ application = {
         id = slugify(id);
 
         this.checkIfPlaylistExists(id, function (exists) {
-            console.log(exists);
+            //console.log(exists);
             if (exists) {
                 self.notify('Name is taken!', 'danger');
             } else {
@@ -257,7 +257,7 @@ application = {
     playlistAction: function (data) {
         var id = data[1]
         var self = this;
-        console.log(id);
+        //console.log(id);
         this.checkIfPlaylistExists(id, function (exists) {
             if (exists) {
                 self.loadPlaylist(id)
@@ -379,20 +379,20 @@ application = {
     },
 
     addToQueue: function (id, title) {
-        console.log(this.getPlaylistConn().push({id: id, title: title, action: this.actions.add}));
+        this.getPlaylistConn().push({id: id, title: title, action: this.actions.add});
         //return this.getPlaylistConn().push({id: data, action: this.actions.add});
     },
 
     removeFromQueue: function (code) {
-        console.log(this.getPlaylistConn().push({id: code, action: this.actions.remove}));
+        this.getPlaylistConn().push({id: code, action: this.actions.remove});
     },
 
     moveUp: function (code) {
-        console.log(this.getPlaylistConn().push({id: code, action: this.actions.moveUp}));
+        this.getPlaylistConn().push({id: code, action: this.actions.moveUp});
     },
 
     moveDown: function (code) {
-        console.log(this.getPlaylistConn().push({id: code, action: this.actions.moveDown}));
+        this.getPlaylistConn().push({id: code, action: this.actions.moveDown});
     },
 
     actions: {
@@ -412,7 +412,7 @@ application = {
         var self = this;
 
         if (!id) {
-            console.log(id);
+            //console.log(id);
             this.notify('No playlist ID specified', 'danger');
             this.redirect('');
         } else {
@@ -424,7 +424,7 @@ application = {
                     self.loadPlaylist(id);
                 } else {
                     self.redirect('');
-                    console.log('not found');
+                    //console.log('not found');
                     self.notify('playlist not found', 'danger');
                 }
             });
@@ -462,7 +462,7 @@ application = {
     },
 
     isPlaying: function () {
-        console.log('isPlaying');
+        //console.log('isPlaying');
 
         if (!this.player || typeof(this.player.getPlayerState) != 'function') {
             return false;
@@ -483,7 +483,7 @@ application = {
 
     switchPlaces: function (index1, index2) {
         var temp = this.queue[index1];
-        console.log('switching ' + index1 + ' ' + index2);
+        //console.log('switching ' + index1 + ' ' + index2);
         this.queue[index1] = this.queue[index2];
         this.queue[index2] = temp;
     },
@@ -497,7 +497,7 @@ application = {
     },
 
     moveVideoDownInPlaylist: function (key) {
-        console.log('moving down');
+        //console.log('moving down');
         var index = this.getIndexOf(key);
         if (index >= 0 && index < this.queue.length - 1) {
             this.switchPlaces(index, index + 1);
@@ -506,7 +506,7 @@ application = {
     },
 
     removeVideoFromPlaylist: function (key) {
-        console.log('removing ' + key);
+        //console.log('removing ' + key);
         var index = this.getIndexOf(key);
         if (index > -1) {
             this.queue.splice(index, 1);
@@ -515,7 +515,7 @@ application = {
     },
 
     playVideoByCode: function (code) {
-        console.log('Playing video by code ' + code)
+        //console.log('Playing video by code ' + code)
         if (this.isPlaying()) {
             this.player.stopVideo();
         }
@@ -524,7 +524,7 @@ application = {
         this.player.playVideo();
 
         $('.playlist-item.current').removeClass('current');
-        console.log('.playlist-item[data-id="' + code + '"]');
+        //console.log('.playlist-item[data-id="' + code + '"]');
 
         //get curr song title
         var song_title = $('.playlist-item[data-id="' + code + '"] .item-title').text();
@@ -601,7 +601,6 @@ function onYouTubeIframeAPIReady() {
         }
     });
 }
-
 
 
 //sticky footer
