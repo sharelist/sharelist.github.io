@@ -201,7 +201,7 @@ application = {
 
             setTimeout(function (){
                 $('#' + btn.id + ' i').removeClass('fa-spin');
-            }, 3000);
+            }, 5000);
         });
 
     },
