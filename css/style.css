@@ -3,6 +3,9 @@ body {
   font-family: Roboto, "Helvetica Neue", sans-serif;
   background: #fafafa; }
 
+a {
+  text-decoration: none; }
+
 a:hover {
   text-decoration: none;
   color: #dd2826; }
@@ -75,6 +78,12 @@ a:hover {
     color: #FFFFFF;
     background-color: #0085AE; }
 
+.shuffle {
+  background-color: #27ae60; }
+  .shuffle:hover, .shuffle:active, .shuffle:visited {
+    color: #FFFFFF;
+    background-color: #2ecc71; }
+
 .input-search {
   margin: 10px 0 21px 0;
   text-align: center;
@@ -126,6 +135,8 @@ footer {
   footer a {
     color: #4A9DF6;
     text-decoration: none; }
+  footer .credit {
+    color: #999; }
 
 .description .fb-row {
   text-align: center;
@@ -161,6 +172,7 @@ footer {
   height: 100vh; }
 
 #playlist {
+  min-height: 100%;
   margin: 0;
   padding: 0;
   overflow: auto; }

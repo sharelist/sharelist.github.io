@@ -137,9 +137,8 @@ application = {
             }
 
             var keyword = encodeURIComponent(searchValue);
-            //var yt_url = '//gdata.youtube.com/feeds/api/videos?q=' + keyword + '&format=5&max-results=10&v=2&alt=jsonc';
             var yt_url = 'https://www.googleapis.com/youtube/v3/search?q=' + keyword + '&format=5&max-results=10&v=2&alt=json';
-                yt_url += '&key=AIzaSyC1Z8X72HT-NJeqHnYA2hyNrUqK7eM7REw&part=snippet';
+            yt_url += '&key=AIzaSyC1Z8X72HT-NJeqHnYA2hyNrUqK7eM7REw&part=snippet';
 
             $.ajax
             ({
@@ -191,7 +190,20 @@ application = {
             if (code) {
                 self.addToQueue(code, title);
             }
-        })
+        });
+
+        $('#shuffle').on('click', function (e) {
+            var btn = e.target;
+            $('#' + btn.id + ' i').addClass('fa-spin');
+            self.queue = shuffle(self.queue);
+            self.createPlaylistView();
+            self.playFirstVideoInQueue();
+
+            setTimeout(function (){
+                $('#' + btn.id + ' i').removeClass('fa-spin');
+            }, 3000);
+        });
+
     },
 
     hashChanged: function (hash) {
@@ -412,7 +424,6 @@ application = {
         var self = this;
 
         if (!id) {
-            //console.log(id);
             this.notify('No playlist ID specified', 'danger');
             this.redirect('');
         } else {
@@ -424,7 +435,6 @@ application = {
                     self.loadPlaylist(id);
                 } else {
                     self.redirect('');
-                    //console.log('not found');
                     self.notify('playlist not found', 'danger');
                 }
             });
@@ -462,8 +472,6 @@ application = {
     },
 
     isPlaying: function () {
-        //console.log('isPlaying');
-
         if (!this.player || typeof(this.player.getPlayerState) != 'function') {
             return false;
         }
@@ -483,7 +491,6 @@ application = {
 
     switchPlaces: function (index1, index2) {
         var temp = this.queue[index1];
-        //console.log('switching ' + index1 + ' ' + index2);
         this.queue[index1] = this.queue[index2];
         this.queue[index2] = temp;
     },
@@ -497,7 +504,6 @@ application = {
     },
 
     moveVideoDownInPlaylist: function (key) {
-        //console.log('moving down');
         var index = this.getIndexOf(key);
         if (index >= 0 && index < this.queue.length - 1) {
             this.switchPlaces(index, index + 1);
@@ -506,7 +512,6 @@ application = {
     },
 
     removeVideoFromPlaylist: function (key) {
-        //console.log('removing ' + key);
         var index = this.getIndexOf(key);
         if (index > -1) {
             this.queue.splice(index, 1);
@@ -515,7 +520,6 @@ application = {
     },
 
     playVideoByCode: function (code) {
-        //console.log('Playing video by code ' + code)
         if (this.isPlaying()) {
             this.player.stopVideo();
         }
@@ -524,8 +528,6 @@ application = {
         this.player.playVideo();
 
         $('.playlist-item.current').removeClass('current');
-        //console.log('.playlist-item[data-id="' + code + '"]');
-
         //get curr song title
         var song_title = $('.playlist-item[data-id="' + code + '"] .item-title').text();
         $('#song-name').text(song_title);
@@ -553,6 +555,13 @@ application = {
             }
             var cur = this.queue[nextIndex];
             this.playVideoByCode(cur.id);
+        }
+    },
+
+    playFirstVideoInQueue: function () {
+        if (this.queue.length > 0) {
+            var first = this.queue[0];
+            this.playVideoByCode(first.id);
         }
     }
 };
@@ -600,6 +609,22 @@ function onYouTubeIframeAPIReady() {
             }
         }
     });
+}
+
+function shuffle(array) {
+    var currentIndex = array.length, temporaryValue, randomIndex;
+
+    while (0 !== currentIndex) {
+
+        randomIndex = Math.floor(Math.random() * currentIndex);
+        currentIndex -= 1;
+
+        temporaryValue = array[currentIndex];
+        array[currentIndex] = array[randomIndex];
+        array[randomIndex] = temporaryValue;
+    }
+
+    return array;
 }
 
 
