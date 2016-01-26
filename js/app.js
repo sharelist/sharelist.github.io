@@ -137,7 +137,7 @@ application = {
             }
 
             var keyword = encodeURIComponent(searchValue);
-            var yt_url = 'https://www.googleapis.com/youtube/v3/search?q=' + keyword + '&format=5&max-results=10&v=2&alt=json';
+            var yt_url = 'https://www.googleapis.com/youtube/v3/search?q=' + keyword + '&format=5&max-results=20&v=2&alt=json';
             yt_url += '&key=AIzaSyC1Z8X72HT-NJeqHnYA2hyNrUqK7eM7REw&part=snippet';
 
             $.ajax
